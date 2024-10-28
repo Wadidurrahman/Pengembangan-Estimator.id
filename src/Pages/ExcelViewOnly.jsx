@@ -3,13 +3,13 @@ import { useNavigate, useParams } from "react-router-dom";
 import jspreadsheet from "jspreadsheet-ce";
 import * as XLSX from "xlsx";
 import "jspreadsheet-ce/dist/jspreadsheet.css";
+import { FiDownload, FiXCircle } from "react-icons/fi";
 
 const ExcelViewComponent = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const sheetRef = useRef(null);
 
-  // Contoh data
   const data = [
     ["Nama", "Usia", "Kota"],
     ["Ali", 25, "Jakarta"],
@@ -19,7 +19,6 @@ const ExcelViewComponent = () => {
 
   useEffect(() => {
     if (sheetRef.current) {
-      // Inisialisasi jspreadsheet hanya jika belum ada tabel
       const jexcel = jspreadsheet(sheetRef.current, {
         data,
         minDimensions: [26, 100],
@@ -27,29 +26,24 @@ const ExcelViewComponent = () => {
         tableOverflow: true,
         defaultColWidth: 100,
         defaultRowHeight: 30,
-        style: {
-          A1: "background-color: #f0f0f0; font-weight: bold;",
-        },
-        columnDrag: false, // Disable drag untuk kolom
-        rowDrag: false, // Disable drag untuk baris
+        style: { A1: "background-color: #f0f0f0; font-weight: bold;" },
+        columnDrag: false,
+        rowDrag: false,
       });
 
-      // Kolom/baris tak terpakai berwarna gelap
       sheetRef.current.querySelectorAll(".jexcel_content td").forEach((cell) => {
         if (!cell.textContent) {
           cell.style.backgroundColor = "#e0e0e0";
         }
       });
 
-      // Hapus jspreadsheet saat komponen dibersihkan
-      return () => {
-        jexcel.destroy(); // Hapus instance untuk mencegah duplikasi
-      };
+      return () => jexcel.destroy();
     }
-  }, []); // Kosongkan dependensi agar efek hanya dijalankan sekali
+  }, []);
 
-  // Fungsi untuk mengekspor data ke Excel
   const handleExport = () => {
+    window.open("http://localhost:8080/export-excel");
+
     const worksheet = XLSX.utils.aoa_to_sheet(data);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Data Template");
@@ -57,21 +51,21 @@ const ExcelViewComponent = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-300 flex items-center justify-center p-4">
-      <div className="bg-white shadow-lg rounded-lg w-full max-w-5xl">
+    <div className="h-screen bg-gray-300 flex items-center justify-center">
+      <div className="bg-white shadow-lg rounded-lg w-full h-full flex flex-col">
         <div className="flex justify-between items-center bg-green-700 text-white py-4 px-6 rounded-t-lg">
-          <h1 className="text-2xl font-bold">Lihat Template</h1>
+          <h1 className="text-2xl font-bold">Template.01</h1>
           <div className="space-x-4">
-            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={handleExport}>
-              Ekspor ke Excel
+            <button className="bg-green-600 hover:bg-green-800 text-white font-bold py-2 px-3 rounded-lg" onClick={handleExport}>
+              <FiDownload size={20} title="Ekspor" />
             </button>
-            <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" onClick={() => navigate("/")}>
-              X
+            <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-3 rounded-lg" onClick={() => navigate("/")}>
+              <FiXCircle size={20} />
             </button>
           </div>
         </div>
 
-        <div ref={sheetRef} className="overflow-auto" style={{ maxHeight: "600px", maxWidth: "100%" }}></div>
+        <div ref={sheetRef} className="overflow-auto flex-grow bg-white" style={{ maxWidth: "100%", minHeight: "0" }}></div>
       </div>
     </div>
   );

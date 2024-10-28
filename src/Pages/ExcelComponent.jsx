@@ -17,7 +17,7 @@ const ExcelComponent = () => {
 
   useEffect(() => {
     const instance = jspreadsheet(sheetRef.current, {
-      data: Array(20).fill(Array(26).fill("")), // Buat data 20x26 (A-Z)
+      data: Array(20).fill(Array(26).fill("")),
       minDimensions: [26, 20],
       editable: true,
       allowInsertRow: true,
@@ -47,7 +47,7 @@ const ExcelComponent = () => {
     const data = spreadsheet.getData();
     console.log("Data tersimpan:", data);
 
-    // Simpan template sebagai duplikat (contoh penanganan data)
+    // Simpan template sebagai duplikat
     const duplicatedTemplate = {
       id: Date.now(), // Buat ID unik baru untuk duplikat
       name: `${fileName} - Duplikat`,
@@ -59,6 +59,8 @@ const ExcelComponent = () => {
   };
 
   const handleExport = () => {
+    window.open("http://localhost:8080/export-excel");
+
     const data = spreadsheet.getData();
     const worksheet = XLSX.utils.aoa_to_sheet(data);
     const workbook = XLSX.utils.book_new();
@@ -78,22 +80,21 @@ const ExcelComponent = () => {
 
   const confirmCancel = () => {
     setShowConfirm(false);
-    navigate("/"); // Arahkan ke list template
+    navigate("/");
   };
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-100">
-      {/* Header */}
-      <header className="bg-white shadow p-4 flex justify-between items-center">
+      <header className="bg-green-700 shadow p-4 flex justify-between items-center">
         <h1 className="text-xl font-bold">{fileName}</h1>
         <div className="flex space-x-4">
-          <button className="text-blue-500 hover:text-blue-700" onClick={() => confirmAction("save")}>
+          <button className="text-white hover:text-green-800 duration-300" onClick={() => confirmAction("save")}>
             <FiSave size={24} title="Simpan" />
           </button>
-          <button className="text-green-500 hover:text-green-700" onClick={handleExport}>
+          <button className="text-white hover:text-green-800 duration-300" onClick={handleExport}>
             <FiDownload size={24} title="Ekspor" />
           </button>
-          <button className="text-gray-500 hover:text-gray-700" onClick={() => navigate(`/view-only/${id}`)}>
+          <button className="text-white hover:text-green-800 duration-300" onClick={() => navigate(`/excel-view/:id`)}>
             <FiEye size={24} title="Lihat Hasil" />
           </button>
           <button className="text-red-500 hover:text-red-700" onClick={() => confirmAction("cancel")}>
@@ -102,19 +103,17 @@ const ExcelComponent = () => {
         </div>
       </header>
 
-      {/* Tabel Spreadsheet */}
       <main className="flex-1 overflow-auto p-4">
         <div ref={sheetRef} className="border shadow-md w-full h-full overflow-auto"></div>
       </main>
 
-      {/* Popup Konfirmasi */}
       {showConfirm && (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
           <div className="bg-white p-6 rounded shadow-lg">
             <h2 className="text-lg font-semibold mb-4">{actionType === "save" ? "Konfirmasi Simpan" : "Konfirmasi Batal"}</h2>
             <p>{actionType === "save" ? "Apakah Anda yakin ingin menyimpan perubahan?" : "Apakah Anda yakin ingin membatalkan?"}</p>
             <div className="mt-4 flex justify-end space-x-2">
-              <button className="bg-blue-500 text-white py-1 px-3 rounded hover:bg-blue-600" onClick={confirmSave}>
+              <button className="bg-green-500 text-white py-1 px-3 rounded hover:bg-green-700" onClick={confirmSave}>
                 Ya
               </button>
               <button className="bg-gray-300 py-1 px-3 rounded hover:bg-gray-400" onClick={() => setShowConfirm(false)}>
