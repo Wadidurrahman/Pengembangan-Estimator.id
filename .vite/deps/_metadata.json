@@ -1,0 +1,55 @@
+{
+  "hash": "77259bb0",
+  "configHash": "2bba2b58",
+  "lockfileHash": "755829e4",
+  "browserHash": "7c966c7f",
+  "optimized": {
+    "jspreadsheet-ce": {
+      "src": "../../node_modules/jspreadsheet-ce/dist/index.js",
+      "file": "jspreadsheet-ce.js",
+      "fileHash": "fba7ab03",
+      "needsInterop": true
+    },
+    "react": {
+      "src": "../../node_modules/react/index.js",
+      "file": "react.js",
+      "fileHash": "c37cdc9f",
+      "needsInterop": true
+    },
+    "react-dom/client": {
+      "src": "../../node_modules/react-dom/client.js",
+      "file": "react-dom_client.js",
+      "fileHash": "279e1a10",
+      "needsInterop": true
+    },
+    "react-icons/fi": {
+      "src": "../../node_modules/react-icons/fi/index.mjs",
+      "file": "react-icons_fi.js",
+      "fileHash": "7ae8323d",
+      "needsInterop": false
+    },
+    "react-router-dom": {
+      "src": "../../node_modules/react-router-dom/dist/index.js",
+      "file": "react-router-dom.js",
+      "fileHash": "f66d21c6",
+      "needsInterop": false
+    },
+    "xlsx": {
+      "src": "../../node_modules/xlsx/xlsx.mjs",
+      "file": "xlsx.js",
+      "fileHash": "6c1bf14b",
+      "needsInterop": false
+    }
+  },
+  "chunks": {
+    "chunk-6UQLG4H2": {
+      "file": "chunk-6UQLG4H2.js"
+    },
+    "chunk-TXI3HGC7": {
+      "file": "chunk-TXI3HGC7.js"
+    },
+    "chunk-7D4SUZUM": {
+      "file": "chunk-7D4SUZUM.js"
+    }
+  }
+}
