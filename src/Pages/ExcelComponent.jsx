@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import "jspreadsheet-ce/dist/jspreadsheet.css";
 import jspreadsheet from "jspreadsheet-ce";
-import { FiEye, FiSave, FiDownload, FiXCircle } from "react-icons/fi";
+import { FiEye, FiSave, FiDownload, FiXCircle, FiUpload } from "react-icons/fi";
 import * as XLSX from "xlsx";
 
 const ExcelComponent = () => {
@@ -47,14 +47,12 @@ const ExcelComponent = () => {
     const data = spreadsheet.getData();
     console.log("Data tersimpan:", data);
 
-    // Simpan template sebagai duplikat
     const duplicatedTemplate = {
-      id: Date.now(), // Buat ID unik baru untuk duplikat
+      id: Date.now(),
       name: `${fileName} - Duplikat`,
       data,
     };
 
-    // Arahkan ke halaman list template dengan data duplikat
     navigate("/", { state: { template: duplicatedTemplate } });
   };
 
@@ -66,6 +64,24 @@ const ExcelComponent = () => {
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
     XLSX.writeFile(workbook, `${fileName}.xlsx`);
+  };
+
+  const handleImport = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const binaryStr = e.target.result;
+      const workbook = XLSX.read(binaryStr, { type: "binary" });
+
+      const sheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[sheetName];
+      const data = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+      spreadsheet.setData(data);
+    };
+    reader.readAsBinaryString(file);
   };
 
   const confirmAction = (type) => {
@@ -86,18 +102,26 @@ const ExcelComponent = () => {
   return (
     <div className="min-h-screen flex flex-col bg-gray-100">
       <header className="bg-green-700 shadow p-4 flex justify-between items-center">
-        <h1 className="text-xl font-bold">{fileName}</h1>
-        <div className="flex space-x-4">
-          <button className="text-white hover:text-green-800 duration-300" onClick={() => confirmAction("save")}>
+        <h1 className="text-white text-xl font-bold">{fileName}</h1>
+        <div className="bg-white rounded-2xl px-2 py-1 flex items-center">
+          <button className="flex items-center justify-center bg-green-100 text-green-700 hover:bg-green-200 hover:text-green-800 duration-300 border-0 rounded-full p-1" onClick={() => confirmAction("save")}>
             <FiSave size={24} title="Simpan" />
           </button>
-          <button className="text-white hover:text-green-800 duration-300" onClick={handleExport}>
+          <div className="border-l-2 border-gray-300 h-8 mx-2" />
+          <button className="flex items-center justify-center bg-green-100 text-green-700 hover:bg-green-200 hover:text-green-800 duration-300 border-0 rounded-full p-1" onClick={handleExport}>
             <FiDownload size={24} title="Ekspor" />
           </button>
-          <button className="text-white hover:text-green-800 duration-300" onClick={() => navigate(`/excel-view/:id`)}>
+          <div className="border-l-2 border-gray-300 h-8 mx-2" />
+          <button className="flex items-center justify-center bg-green-100 text-green-700 hover:bg-green-200 hover:text-green-800 duration-300 border-0 rounded-full p-1" onClick={() => navigate(`/excel-view/:id`)}>
             <FiEye size={24} title="Lihat Hasil" />
           </button>
-          <button className="text-red-500 hover:text-red-700" onClick={() => confirmAction("cancel")}>
+          <div className="border-l-2 border-gray-300 h-8 mx-2" />
+          <label className="flex items-center justify-center bg-blue-100 text-blue-700 hover:bg-blue-200 hover:text-blue-800 duration-300 border-0 rounded-full p-1 cursor-pointer">
+            <FiUpload size={24} title="Import" />
+            <input type="file" accept=".xlsx, .xls" className="hidden" onChange={handleImport} />
+          </label>
+          <div className="border-l-2 border-gray-300 h-8 mx-2" />
+          <button className="flex items-center justify-center bg-red-100 text-red-500 hover:bg-red-200 hover:text-red-700 duration-300 border-0 rounded-full p-1" onClick={() => confirmAction("cancel")}>
             <FiXCircle size={24} title="Batal" />
           </button>
         </div>
