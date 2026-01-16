@@ -10,18 +10,23 @@ const ExcelViewComponent = () => {
   const navigate = useNavigate();
   const sheetRef = useRef(null);
   const [spreadsheet, setSpreadsheet] = useState(null);
-
-  const data = [
-    ["Nama", "Umur", "Kota"],
-    ["Ali", 25, "Jakarta"],
-    ["Budi", 30, "Surabaya"],
-    ["Cici", 27, "Bandung"],
-  ];
+  const [data, setData] = useState([]);
 
   useEffect(() => {
+    // Fungsi untuk memuat template dari localStorage
+    const loadTemplate = () => {
+      const savedData = JSON.parse(localStorage.getItem(`templateData-${id}`));
+      if (savedData && savedData.length) {
+        setData(savedData);
+      }
+    };
+
+    loadTemplate(); // Memuat template saat komponen di-mount
+
+    // Inisialisasi jspreadsheet setelah data diatur
     const instance = jspreadsheet(sheetRef.current, {
       data,
-      minDimensions: [26, 20],
+      minDimensions: [data[0]?.length || 10, data.length || 10], // Menyesuaikan dimensi dengan data
       editable: false,
       allowInsertRow: false,
       allowInsertColumn: false,
@@ -31,21 +36,24 @@ const ExcelViewComponent = () => {
       tableOverflow: true,
       tableWidth: "100%",
       tableHeight: "calc(100vh - 120px)",
-      columns: Array(26).fill({ width: 120 }),
+      columns: Array(data[0]?.length || 10).fill({ width: 120 }),
 
-      // Styling dinamis untuk setiap sel
+      // Styling dinamis untuk setiap sel yang ada datanya
       updateTable: (instance, cell, x, y, value) => {
         if (value) {
-          // Sel dengan data: background putih dan teks hitam
-          cell.style.backgroundColor = "#F9FAFB"; // Abu terang
-          cell.style.color = "#111827"; // Teks abu tua (hampir hitam)
+          cell.style.backgroundColor = "#FFFFFF"; // Background putih untuk sel berisi data
+          cell.style.color = "#111827"; // Teks abu tua
           cell.style.border = "1px solid #E5E7EB"; // Border abu muda
         } else {
-          // Sel kosong: background abu gelap dan border abu
-          cell.style.backgroundColor = "#4B5563"; // Background abu gelap
-          cell.style.color = "#E5E7EB"; // Teks abu terang
-          cell.style.border = "1px solid #6B7280";
+          cell.style.backgroundColor = ""; // Warna default untuk sel kosong
+          cell.style.color = ""; // Warna default teks
+          cell.style.border = "1px solid #E5E7EB"; // Border abu muda tetap untuk sel kosong
         }
+      },
+
+      onChange: (instance, cell, x, y, value) => {
+        const updatedData = instance.getData(); // Ambil data terkini
+        localStorage.setItem(`templateData-${id}`, JSON.stringify(updatedData)); // Simpan ke localStorage
       },
     });
 
@@ -54,7 +62,13 @@ const ExcelViewComponent = () => {
     return () => {
       if (instance) instance.destroy();
     };
-  }, []);
+  }, [id]);
+
+  useEffect(() => {
+    if (spreadsheet) {
+      spreadsheet.setData(data); // Mengupdate spreadsheet dengan data yang baru
+    }
+  }, [data, spreadsheet]);
 
   const handleExport = () => {
     const worksheet = XLSX.utils.aoa_to_sheet(data);
@@ -64,8 +78,8 @@ const ExcelViewComponent = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-3 00">
-      <header className="bg-green-700 shadow p-4 flex justify-between items-center">
+    <div className="min-h-screen flex flex-col bg-gray-300">
+      <header className="bg-[#089613] shadow p-4 flex justify-between items-center">
         <h1 className="text-white text-xl font-bold">Template View - {id}</h1>
         <div className="bg-white rounded-2xl px-2 py-1 flex items-center">
           <button className="flex items-center justify-center bg-green-100 text-green-700 hover:bg-green-200 duration-300 border-0 rounded-full p-1" onClick={handleExport}>
