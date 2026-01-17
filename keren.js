@@ -1,0 +1,1 @@
+Fullsatck developer, harus
